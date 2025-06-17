@@ -7,9 +7,6 @@ export interface Comment {
   createdAt: Date;
 }
 
-// Debug: Log when the interfaces are loaded
-console.log('[Debug] comment.model.ts: Interfaces loaded');
-
 export interface CreateCommentRequest {
   projectId: string;
   taskId: string;
