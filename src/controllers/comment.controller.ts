@@ -11,6 +11,7 @@ export class CommentController {
   async createComment(req: Request, res: Response): Promise<void> {
     try {
       const userId = this.identityProvider.getUserId(req);
+      console.log('Attempting to create comment for user:', userId);
       if (!userId) {
         res.status(401).json({ error: 'User ID required' });
         return;
@@ -22,7 +23,9 @@ export class CommentController {
         return;
       }
 
+      console.log('Creating comment with data:', { projectId, taskId, text });
       const comment = await this.commentService.createComment(userId, { projectId, taskId, text });
+      console.log('Comment created successfully:', comment.id);
       res.status(201).json(comment);
     } catch (error) {
       if (error instanceof Error && error.message === 'Access denied') {
@@ -36,6 +39,7 @@ export class CommentController {
   async getComments(req: Request, res: Response): Promise<void> {
     try {
       const userId = this.identityProvider.getUserId(req);
+      console.log('Attempting to create comment for user:', userId);
       if (!userId) {
         res.status(401).json({ error: 'User ID required' });
         return;
@@ -47,7 +51,9 @@ export class CommentController {
         return;
       }
 
+      console.log('Fetching comments for project:', projectId, 'and task:', taskId);
       const comments = await this.commentService.getComments(userId, projectId as string, taskId as string);
+      console.log('Found', comments.length, 'comments');
       res.status(200).json(comments);
     } catch (error) {
       if (error instanceof Error && error.message === 'Access denied') {

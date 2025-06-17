@@ -34,6 +34,7 @@ export class PermissionServiceClient {
   }
 
   async hasPermission(subjectId: string, domain: Domain, action: Action): Promise<boolean> {
+    console.log(`Checking permission for subject ${subjectId} on ${domain} with action ${action}`);
     try {
       const response = await axios.get<PermissionResponse>(
         `${this.baseUrl}/permissions/check`,
@@ -45,7 +46,9 @@ export class PermissionServiceClient {
           }
         }
       );
-      return response.data.allowed;
+      const allowed = response.data.allowed;
+      console.log(`Permission check result for ${subjectId}: ${allowed}`);
+      return allowed;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         // Handle specific error cases if needed
@@ -53,6 +56,7 @@ export class PermissionServiceClient {
       } else {
         console.error(`Unexpected error during permission check: ${error}`);
       }
+      console.error(`Permission check failed for ${subjectId} - defaulting to deny`);
       return false; // Default to denying permission on error
     }
   }

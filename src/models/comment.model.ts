@@ -7,8 +7,12 @@ export interface Comment {
   createdAt: Date;
 }
 
+console.debug('Comment model interface loaded');
+
 export interface CreateCommentRequest {
   projectId: string;
   taskId: string;
   text: string;
 }
+
+console.debug('CreateCommentRequest interface loaded');
