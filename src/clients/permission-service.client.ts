@@ -5,7 +5,8 @@ export enum Domain {
   PROJECT_USER = 'PROJECT_USER',
   TASK = 'TASK',
   SUBSCRIPTION = 'SUBSCRIPTION',
-  USER = 'USER'
+  USER = 'USER',
+  COMMENT = 'COMMENT'
 }
 
 export enum Action {
