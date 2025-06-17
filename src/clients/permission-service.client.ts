@@ -1,4 +1,19 @@
 import axios from 'axios';
+import { Logger } from 'winston';
+import { createLogger, format, transports } from 'winston';
+
+const logger: Logger = createLogger({
+  level: 'info',
+  format: format.combine(
+    format.timestamp(),
+    format.printf(({ level, message, timestamp }) => {
+      return `[${timestamp}] [${level}]: ${message}`;
+    })
+  ),
+  transports: [
+    new transports.Console()
+  ]
+});
 
 export enum Domain {
   PROJECT = 'PROJECT',
@@ -35,6 +50,7 @@ export class PermissionServiceClient {
 
   async hasPermission(subjectId: string, domain: Domain, action: Action): Promise<boolean> {
     try {
+      logger.info(`Checking permission for subjectId: ${subjectId}, domain: ${domain}, action: ${action}`);
       const response = await axios.get<PermissionResponse>(
         `${this.baseUrl}/permissions/check`,
         {
@@ -45,13 +61,13 @@ export class PermissionServiceClient {
           }
         }
       );
+      logger.info(`Permission check result: ${response.data.allowed}`);
       return response.data.allowed;
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        // Handle specific error cases if needed
-        console.error(`Permission check failed: ${error.message}`);
+        logger.error(`Permission check failed: ${error.message}`);
       } else {
-        console.error(`Unexpected error during permission check: ${error}`);
+        logger.error(`Unexpected error during permission check: ${error}`);
       }
       return false; // Default to denying permission on error
     }
