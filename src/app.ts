@@ -9,6 +9,8 @@ export function createApp(permissionServiceConfig: { host: string; port: number 
   const app = express();
   app.use(express.json());
 
+  console.log('Starting application with permissionServiceConfig:', permissionServiceConfig);
+
   const identityProvider = new IdentityProvider();
   const permissionServiceClient = new PermissionServiceClient(permissionServiceConfig);
   const commentService = new CommentService(permissionServiceClient);
@@ -16,9 +18,18 @@ export function createApp(permissionServiceConfig: { host: string; port: number 
   const healthController = new HealthController();
   const commentController = new CommentController(commentService, identityProvider);
 
-  app.get('/health', (req, res) => healthController.getHealth(req, res));
-  app.post('/comments', (req, res) => commentController.createComment(req, res));
-  app.get('/comments', (req, res) => commentController.getComments(req, res));
+  app.get('/health', (req, res) => {
+    console.log('Received GET /health request');
+    healthController.getHealth(req, res);
+  });
+  app.post('/comments', (req, res) => {
+    console.log('Received POST /comments request. Body:', req.body);
+    commentController.createComment(req, res);
+  });
+  app.get('/comments', (req, res) => {
+    console.log('Received GET /comments request. Query:', req.query);
+    commentController.getComments(req, res);
+  });
 
   return app;
 }
