@@ -12,3 +12,5 @@ export interface CreateCommentRequest {
   taskId: string;
   text: string;
 }
+
+console.log('Loaded comment.model.ts');
