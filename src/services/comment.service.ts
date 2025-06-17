@@ -10,6 +10,7 @@ export class CommentService {
   async createComment(userId: string, request: CreateCommentRequest): Promise<Comment> {
     const hasPermission = await this.permissionServiceClient.hasPermission(userId, Domain.COMMENT, Action.CREATE);
     if (!hasPermission) {
+      console.log(`User ${userId} denied CREATE permission for comments`);
       throw new Error('Access denied');
     }
 
@@ -23,16 +24,22 @@ export class CommentService {
     };
 
     this.comments.push(comment);
+    console.log(`Created comment ${comment.id} for task ${taskId} by user ${userId}`);
     return comment;
   }
 
   async getComments(userId: string, projectId: string, taskId: string): Promise<Comment[]> {
     const hasPermission = await this.permissionServiceClient.hasPermission(userId, Domain.COMMENT, Action.LIST);
     if (!hasPermission) {
+      console.log(`User ${userId} denied CREATE permission for comments`);
       throw new Error('Access denied');
     }
 
-    return this.comments.filter(comment => 
+    const filteredComments = this.comments.filter(comment => 
+      comment.projectId === projectId && comment.taskId === taskId
+    );
+    console.log(`Found ${filteredComments.length} comments for task ${taskId}`);
+    return filteredComments;
       comment.projectId === projectId && comment.taskId === taskId
     );
   }

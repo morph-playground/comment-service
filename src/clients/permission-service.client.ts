@@ -31,9 +31,11 @@ export class PermissionServiceClient {
 
   constructor(config: PermissionServiceConfig) {
     this.baseUrl = `http://${config.host}:${config.port}`;
+    console.log(`Initialized PermissionServiceClient with base URL: ${this.baseUrl}`);
   }
 
   async hasPermission(subjectId: string, domain: Domain, action: Action): Promise<boolean> {
+    console.log(`Checking permission for subject ${subjectId} on domain ${domain} for action ${action}`);
     try {
       const response = await axios.get<PermissionResponse>(
         `${this.baseUrl}/permissions/check`,
@@ -45,7 +47,9 @@ export class PermissionServiceClient {
           }
         }
       );
-      return response.data.allowed;
+      const allowed = response.data.allowed;
+      console.log(`Permission check result for ${subjectId}: ${allowed}`);
+      return allowed;
     } catch (error) {
       if (axios.isAxiosError(error)) {
         // Handle specific error cases if needed
