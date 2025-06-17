@@ -2,6 +2,7 @@ import request from 'supertest';
 import express from 'express';
 import nock from 'nock';
 import { createApp } from '../../src/app';
+import { randomUUID } from "node:crypto";
 
 const permissionServiceHost = 'localhost';
 const permissionServicePort = 3001;
@@ -100,8 +101,8 @@ describe('Comment Integration Tests', () => {
 
   describe('GET /comments', () => {
     it('should retrieve comments successfully', async () => {
-      const userId = 'user-123';
-      const projectId = 'project-1';
+      const userId = "user-" + randomUUID();
+      const projectId = 'project-' + randomUUID();
       const taskId = 'task-1';
 
       // First create a comment
