@@ -8,9 +8,9 @@ export class CommentService {
   constructor(private permissionServiceClient: PermissionServiceClient) {}
 
   async createComment(userId: string, request: CreateCommentRequest): Promise<Comment> {
-    console.log(`createComment called with userId=${userId}, projectId=${request.projectId}, taskId=${request.taskId}`);
+    (`createComment called with userId=${userId}, projectId=${request.projectId}, taskId=${request.taskId}`);
     const hasPermission = await this.permissionServiceClient.hasPermission(userId, Domain.COMMENT, Action.CREATE);
-    console.log(`Permission check for CREATE comment: userId=${userId}, result=${hasPermission}`);
+    (`Permission check for CREATE comment: userId=${userId}, result=${hasPermission}`);
     if (!hasPermission) {
       console.error(`Access denied for userId=${userId} on create comment`);
       throw new Error('Access denied');
@@ -26,14 +26,14 @@ export class CommentService {
     };
 
     this.comments.push(comment);
-    console.log(`Comment created: ${JSON.stringify(comment)}`);
+    (`Comment created: ${JSON.stringify(comment)}`);
     return comment;
   }
 
   async getComments(userId: string, projectId: string, taskId: string): Promise<Comment[]> {
-    console.log(`getComments called with userId=${userId}, projectId=${projectId}, taskId=${taskId}`);
+    (`getComments called with userId=${userId}, projectId=${projectId}, taskId=${taskId}`);
     const hasPermission = await this.permissionServiceClient.hasPermission(userId, Domain.COMMENT, Action.LIST);
-    console.log(`Permission check for LIST comment: userId=${userId}, result=${hasPermission}`);
+    (`Permission check for LIST comment: userId=${userId}, result=${hasPermission}`);
     if (!hasPermission) {
       console.error(`Access denied for userId=${userId} on list comments`);
       throw new Error('Access denied');
@@ -42,7 +42,7 @@ export class CommentService {
     const filteredComments = this.comments.filter(comment => 
       comment.projectId === projectId && comment.taskId === taskId
     );
-    console.log(`Found ${filteredComments.length} comments for projectId=${projectId}, taskId=${taskId}`);
+    (`Found ${filteredComments.length} comments for projectId=${projectId}, taskId=${taskId}`);
     return filteredComments;
   }
 }

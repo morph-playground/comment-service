@@ -11,7 +11,7 @@ export class CommentController {
   async createComment(req: Request, res: Response): Promise<void> {
     try {
       const userId = this.identityProvider.getUserId(req);
-      console.log(`[CommentController] createComment called by userId: ${userId}`);
+      (`[CommentController] createComment called by userId: ${userId}`);
       if (!userId) {
         console.warn('[CommentController] User ID missing in createComment');
         res.status(401).json({ error: 'User ID required' });
@@ -25,9 +25,9 @@ export class CommentController {
         return;
       }
 
-      console.log(`[CommentController] Creating comment for projectId: ${projectId}, taskId: ${taskId}`);
+      (`[CommentController] Creating comment for projectId: ${projectId}, taskId: ${taskId}`);
       const comment = await this.commentService.createComment(userId, { projectId, taskId, text });
-      console.log('[CommentController] Comment created:', comment);
+      ('[CommentController] Comment created:', comment);
       res.status(201).json(comment);
     } catch (error) {
       console.error('[CommentController] Error in createComment:', error);
@@ -42,7 +42,7 @@ export class CommentController {
   async getComments(req: Request, res: Response): Promise<void> {
     try {
       const userId = this.identityProvider.getUserId(req);
-      console.log(`[CommentController] getComments called by userId: ${userId}`);
+      (`[CommentController] getComments called by userId: ${userId}`);
       if (!userId) {
         console.warn('[CommentController] User ID missing in getComments');
         res.status(401).json({ error: 'User ID required' });
@@ -56,9 +56,9 @@ export class CommentController {
         return;
       }
 
-      console.log(`[CommentController] Fetching comments for projectId: ${projectId}, taskId: ${taskId}`);
+      (`[CommentController] Fetching comments for projectId: ${projectId}, taskId: ${taskId}`);
       const comments = await this.commentService.getComments(userId, projectId as string, taskId as string);
-      console.log('[CommentController] Comments fetched:', comments);
+      ('[CommentController] Comments fetched:', comments);
       res.status(200).json(comments);
     } catch (error) {
       console.error('[CommentController] Error in getComments:', error);
