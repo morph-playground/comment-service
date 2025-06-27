@@ -7,9 +7,9 @@ export class CommentService {
 
   constructor(private permissionServiceClient: PermissionServiceClient) {}
 
-  async createComment(userId: string, request: CreateCommentRequest): Promise<Comment> {
-    console.log(`createComment called with userId=${userId}, projectId=${request.projectId}, taskId=${request.taskId}`);
-    const hasPermission = await this.permissionServiceClient.hasPermission(userId, Domain.COMMENT, Action.CREATE);
+  async createComment(userId: string, request: CreateCommentRequest, tenantId: string): Promise<Comment> {
+    console.log(`createComment called with userId=${userId}, projectId=${request.projectId}, taskId=${request.taskId}, tenantId=${tenantId}`);
+    const hasPermission = await this.permissionServiceClient.hasPermission(userId, tenantId, Domain.COMMENT, Action.CREATE);
     console.log(`Permission check for CREATE comment: userId=${userId}, result=${hasPermission}`);
     if (!hasPermission) {
       console.error(`Access denied for userId=${userId} on create comment`);
@@ -30,9 +30,9 @@ export class CommentService {
     return comment;
   }
 
-  async getComments(userId: string, projectId: string, taskId: string): Promise<Comment[]> {
-    console.log(`getComments called with userId=${userId}, projectId=${projectId}, taskId=${taskId}`);
-    const hasPermission = await this.permissionServiceClient.hasPermission(userId, Domain.COMMENT, Action.LIST);
+  async getComments(userId: string, projectId: string, taskId: string, tenantId: string): Promise<Comment[]> {
+    console.log(`getComments called with userId=${userId}, projectId=${projectId}, taskId=${taskId}, tenantId=${tenantId}`);
+    const hasPermission = await this.permissionServiceClient.hasPermission(userId, tenantId, Domain.COMMENT, Action.LIST);
     console.log(`Permission check for LIST comment: userId=${userId}, result=${hasPermission}`);
     if (!hasPermission) {
       console.error(`Access denied for userId=${userId} on list comments`);

@@ -26,7 +26,13 @@ export class CommentController {
       }
 
       console.log(`[CommentController] Creating comment for projectId: ${projectId}, taskId: ${taskId}`);
-      const comment = await this.commentService.createComment(userId, { projectId, taskId, text });
+      const tenantId = this.identityProvider.getTenantId(req);
+      if (!tenantId) {
+        console.warn('[CommentController] Tenant ID missing in createComment');
+        res.status(400).json({ error: 'Tenant ID required' });
+        return;
+      }
+      const comment = await this.commentService.createComment(userId, { projectId, taskId, text }, tenantId);
       console.log('[CommentController] Comment created:', comment);
       res.status(201).json(comment);
     } catch (error) {
@@ -57,7 +63,13 @@ export class CommentController {
       }
 
       console.log(`[CommentController] Fetching comments for projectId: ${projectId}, taskId: ${taskId}`);
-      const comments = await this.commentService.getComments(userId, projectId as string, taskId as string);
+      const tenantId = this.identityProvider.getTenantId(req);
+      if (!tenantId) {
+        console.warn('[CommentController] Tenant ID missing in getComments');
+        res.status(400).json({ error: 'Tenant ID required' });
+        return;
+      }
+      const comments = await this.commentService.getComments(userId, projectId as string, taskId as string, tenantId);
       console.log('[CommentController] Comments fetched:', comments);
       res.status(200).json(comments);
     } catch (error) {
