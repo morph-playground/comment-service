@@ -11,10 +11,16 @@ export class CommentController {
   async createComment(req: Request, res: Response): Promise<void> {
     try {
       const userId = this.identityProvider.getUserId(req);
-      console.log(`[CommentController] createComment called by userId: ${userId}`);
+      const tenantId = this.identityProvider.getTenantId(req);
+      console.log(`[CommentController] createComment called by userId: ${userId}, tenantId: ${tenantId}`);
       if (!userId) {
         console.warn('[CommentController] User ID missing in createComment');
         res.status(401).json({ error: 'User ID required' });
+        return;
+      }
+      if (!tenantId) {
+        console.warn('[CommentController] Tenant ID missing in createComment');
+        res.status(401).json({ error: 'Tenant ID required' });
         return;
       }
 
@@ -26,7 +32,7 @@ export class CommentController {
       }
 
       console.log(`[CommentController] Creating comment for projectId: ${projectId}, taskId: ${taskId}`);
-      const comment = await this.commentService.createComment(userId, { projectId, taskId, text });
+      const comment = await this.commentService.createComment(userId, tenantId, { projectId, taskId, text });
       console.log('[CommentController] Comment created:', comment);
       res.status(201).json(comment);
     } catch (error) {
@@ -42,10 +48,16 @@ export class CommentController {
   async getComments(req: Request, res: Response): Promise<void> {
     try {
       const userId = this.identityProvider.getUserId(req);
-      console.log(`[CommentController] getComments called by userId: ${userId}`);
+      const tenantId = this.identityProvider.getTenantId(req);
+      console.log(`[CommentController] getComments called by userId: ${userId}, tenantId: ${tenantId}`);
       if (!userId) {
         console.warn('[CommentController] User ID missing in getComments');
         res.status(401).json({ error: 'User ID required' });
+        return;
+      }
+      if (!tenantId) {
+        console.warn('[CommentController] Tenant ID missing in getComments');
+        res.status(401).json({ error: 'Tenant ID required' });
         return;
       }
 
@@ -57,7 +69,7 @@ export class CommentController {
       }
 
       console.log(`[CommentController] Fetching comments for projectId: ${projectId}, taskId: ${taskId}`);
-      const comments = await this.commentService.getComments(userId, projectId as string, taskId as string);
+      const comments = await this.commentService.getComments(userId, tenantId, projectId as string, taskId as string);
       console.log('[CommentController] Comments fetched:', comments);
       res.status(200).json(comments);
     } catch (error) {

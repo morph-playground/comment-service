@@ -26,6 +26,7 @@ describe('Comment Integration Tests', () => {
   describe('POST /comments', () => {
     it('should create a comment successfully', async () => {
       const userId = 'user-123';
+      const tenantId = 'tenant-123';
       const commentData = {
         projectId: 'project-1',
         taskId: 'task-1',
@@ -33,9 +34,10 @@ describe('Comment Integration Tests', () => {
       };
 
       nock(permissionServiceBaseUrl)
-        .get('/permissions/check')
+        .get('/permissions/v2/check')
         .query({
           subjectId: userId,
+          tenantId: tenantId,
           domain: 'COMMENT',
           action: 'CREATE'
         })
@@ -44,6 +46,7 @@ describe('Comment Integration Tests', () => {
       const response = await request(app)
         .post('/comments')
         .set('identity-user-id', userId)
+        .set('identity-tenant-id', tenantId)
         .send(commentData);
 
       expect(response.status).toBe(201);
@@ -66,14 +69,32 @@ describe('Comment Integration Tests', () => {
 
       const response = await request(app)
         .post('/comments')
+        .set('identity-tenant-id', 'tenant-123')
         .send(commentData);
 
       expect(response.status).toBe(401);
       expect(response.body).toEqual({ error: 'User ID required' });
     });
 
+    it('should return 401 when tenant ID is missing', async () => {
+      const commentData = {
+        projectId: 'project-1',
+        taskId: 'task-1',
+        text: 'This is a test comment'
+      };
+
+      const response = await request(app)
+        .post('/comments')
+        .set('identity-user-id', 'user-123')
+        .send(commentData);
+
+      expect(response.status).toBe(401);
+      expect(response.body).toEqual({ error: 'Tenant ID required' });
+    });
+
     it('should return 403 when user lacks permission', async () => {
       const userId = 'user-123';
+      const tenantId = 'tenant-123';
       const commentData = {
         projectId: 'project-1',
         taskId: 'task-1',
@@ -81,9 +102,10 @@ describe('Comment Integration Tests', () => {
       };
 
       nock(permissionServiceBaseUrl)
-        .get('/permissions/check')
+        .get('/permissions/v2/check')
         .query({
           subjectId: userId,
+          tenantId: tenantId,
           domain: 'COMMENT',
           action: 'CREATE'
         })
@@ -92,6 +114,7 @@ describe('Comment Integration Tests', () => {
       const response = await request(app)
         .post('/comments')
         .set('identity-user-id', userId)
+        .set('identity-tenant-id', tenantId)
         .send(commentData);
 
       expect(response.status).toBe(403);
@@ -102,14 +125,16 @@ describe('Comment Integration Tests', () => {
   describe('GET /comments', () => {
     it('should retrieve comments successfully', async () => {
       const userId = "user-" + randomUUID();
+      const tenantId = "tenant-" + randomUUID();
       const projectId = 'project-' + randomUUID();
       const taskId = 'task-1';
 
       // First create a comment
       nock(permissionServiceBaseUrl)
-        .get('/permissions/check')
+        .get('/permissions/v2/check')
         .query({
           subjectId: userId,
+          tenantId: tenantId,
           domain: 'COMMENT',
           action: 'CREATE'
         })
@@ -118,6 +143,7 @@ describe('Comment Integration Tests', () => {
       await request(app)
         .post('/comments')
         .set('identity-user-id', userId)
+        .set('identity-tenant-id', tenantId)
         .send({
           projectId,
           taskId,
@@ -126,9 +152,10 @@ describe('Comment Integration Tests', () => {
 
       // Then retrieve comments
       nock(permissionServiceBaseUrl)
-        .get('/permissions/check')
+        .get('/permissions/v2/check')
         .query({
           subjectId: userId,
+          tenantId: tenantId,
           domain: 'COMMENT',
           action: 'LIST'
         })
@@ -137,6 +164,7 @@ describe('Comment Integration Tests', () => {
       const response = await request(app)
         .get('/comments')
         .set('identity-user-id', userId)
+        .set('identity-tenant-id', tenantId)
         .query({ projectId, taskId });
 
       expect(response.status).toBe(200);
@@ -153,19 +181,32 @@ describe('Comment Integration Tests', () => {
     it('should return 401 when user ID is missing', async () => {
       const response = await request(app)
         .get('/comments')
+        .set('identity-tenant-id', 'tenant-123')
         .query({ projectId: 'project-1', taskId: 'task-1' });
 
       expect(response.status).toBe(401);
       expect(response.body).toEqual({ error: 'User ID required' });
     });
 
+    it('should return 401 when tenant ID is missing', async () => {
+      const response = await request(app)
+        .get('/comments')
+        .set('identity-user-id', 'user-123')
+        .query({ projectId: 'project-1', taskId: 'task-1' });
+
+      expect(response.status).toBe(401);
+      expect(response.body).toEqual({ error: 'Tenant ID required' });
+    });
+
     it('should return 403 when user lacks permission', async () => {
       const userId = 'user-123';
+      const tenantId = 'tenant-123';
 
       nock(permissionServiceBaseUrl)
-        .get('/permissions/check')
+        .get('/permissions/v2/check')
         .query({
           subjectId: userId,
+          tenantId: tenantId,
           domain: 'COMMENT',
           action: 'LIST'
         })
@@ -174,6 +215,7 @@ describe('Comment Integration Tests', () => {
       const response = await request(app)
         .get('/comments')
         .set('identity-user-id', userId)
+        .set('identity-tenant-id', tenantId)
         .query({ projectId: 'project-1', taskId: 'task-1' });
 
       expect(response.status).toBe(403);
@@ -182,13 +224,15 @@ describe('Comment Integration Tests', () => {
 
     it('should return empty array when no comments exist', async () => {
       const userId = 'user-456';
+      const tenantId = 'tenant-456';
       const projectId = 'project-2';
       const taskId = 'task-2';
 
       nock(permissionServiceBaseUrl)
-        .get('/permissions/check')
+        .get('/permissions/v2/check')
         .query({
           subjectId: userId,
+          tenantId: tenantId,
           domain: 'COMMENT',
           action: 'LIST'
         })
@@ -197,6 +241,7 @@ describe('Comment Integration Tests', () => {
       const response = await request(app)
         .get('/comments')
         .set('identity-user-id', userId)
+        .set('identity-tenant-id', tenantId)
         .query({ projectId, taskId });
 
       expect(response.status).toBe(200);
