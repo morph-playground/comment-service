@@ -34,15 +34,16 @@ export class PermissionServiceClient {
     console.log(`[PermissionServiceClient] Initialized with baseUrl: ${this.baseUrl}`);
   }
 
-  async hasPermission(subjectId: string, domain: Domain, action: Action): Promise<boolean> {
+  async hasPermission(subjectId: string, tenantId: string, domain: Domain, action: Action): Promise<boolean> {
     console.log(`[PermissionServiceClient] Checking permission:
-      subjectId=${subjectId}, domain=${domain}, action=${action}`);
+      subjectId=${subjectId}, tenantId=${tenantId}, domain=${domain}, action=${action}`);
     try {
       const response = await axios.get<PermissionResponse>(
-        `${this.baseUrl}/permissions/check`,
+        `${this.baseUrl}/permissions/v2/check`,
         {
           params: {
             subjectId,
+            tenantId,
             domain,
             action
           }
@@ -52,7 +53,6 @@ export class PermissionServiceClient {
       return response.data.allowed;
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        // Handle specific error cases if needed
         console.error(`[PermissionServiceClient] Permission check failed: ${error.message}`);
       } else {
         console.error(`[PermissionServiceClient] Unexpected error during permission check: ${error}`);
